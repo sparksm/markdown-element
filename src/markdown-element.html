@@ -1,0 +1,69 @@
+<script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../bower_components/marked/marked.min.js"></script>
+
+<template>
+	<style></style>
+	<div class="markdown-body"></div>
+</template>
+
+<script>
+(function(window, document, undefined) {
+
+	// Refers to the "importer"
+	var thatDoc = document;
+
+	// Refers to the "importee"
+	var thisDoc =	 (thatDoc._currentScript || thatDoc.currentScript).ownerDocument;
+
+	// Gets content from <template>
+	var template = thisDoc.querySelector('template').content;
+
+	// Creates an object based in the HTML Element prototype
+	var markDownProto = Object.create(HTMLElement.prototype);
+
+	// Creates the "markdown" attribute and sets a default value
+	markDownProto.markdown = '';
+
+	// Fires when an instance of the element is created
+	markDownProto.createdCallback = function() {
+		var self = this;
+
+		// Creates the shadow root
+		var shadowRoot = this.createShadowRoot();
+
+		// Adds a template clone into shadow root
+		var clone = thatDoc.importNode(template, true);
+		shadowRoot.appendChild(clone);
+
+		// Caches <strong> DOM query
+		this.div = shadowRoot.querySelector('div');
+		this.css = shadowRoot.querySelector('style');
+
+		//loads the css as <style>
+		$.ajax('bower_components/github-markdown-css/github-markdown.css').done(function (data) {
+			self.css.textContent = data;
+		});
+
+		// Checks if the "markdown" attribute has been overwritten
+		if (this.textContent) {
+			var markdown = marked(this.textContent);
+			this.setmarkdown(markdown);
+		} else {
+			this.setmarkdown(this.markdown);
+		}
+	};
+
+	// Sets new value to "markdown" attribute
+	markDownProto.setmarkdown = function(val) {
+		this.markdown = val;
+
+		// Sets "markdown" value into <strong>
+		this.div.innerHTML = this.markdown;
+	};
+
+	// Registers <hello-world> in the main document
+	window.MyElement = thatDoc.registerElement('markdown-element', {
+		prototype: markDownProto
+	});
+})(window, document);
+</script>
