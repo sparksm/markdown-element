@@ -1,8 +1,25 @@
 <link rel="import" href="../../../elements/lib/lib-jquery/lib-jquery.html" />
 <script src="../../marked/marked.min.js"></script>
+<!--
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../bower_components/marked/marked.min.js"></script>
+-->
 
 <template>
-	<style></style>
+	<style>
+		.markdown-body{
+			opacity: 0;
+			-webkit-transition: opacity 300ms ease;
+			   -moz-transition: opacity 300ms ease;
+			    -ms-transition: opacity 300ms ease;
+			     -o-transition: opacity 300ms ease;
+			        transition: opacity 300ms ease;
+		}
+		.markdown-body.loaded{
+			opacity: 1;
+		}
+	</style>
+	<style id="external-css"></style>
 	<div class="markdown-body"></div>
 </template>
 
@@ -36,29 +53,57 @@
 		shadowRoot.appendChild(clone);
 
 		// Caches <strong> DOM query
-		this.div = shadowRoot.querySelector('div');
-		this.css = shadowRoot.querySelector('style');
-
-		//loads the css as <style>
-		$.ajax('bower_components/github-markdown-css/github-markdown.css').done(function (data) {
-			self.css.textContent = data;
-		});
+		this.div = shadowRoot.querySelector('.markdown-body');
+		this.css = shadowRoot.querySelector('#external-css');
 
 		// Checks if the "markdown" attribute has been overwritten
+		if (this.hasAttribute('src') && this.getAttribute('src') !== '') {
+			$.ajax(this.getAttribute('src')).done(function (data) {
+				self.setmarkdown(marked(data));
+			});
+		}
 		if (this.textContent) {
 			var markdown = marked(this.textContent);
 			this.setmarkdown(markdown);
-		} else {
-			this.setmarkdown(this.markdown);
 		}
+
+		this.setcss();
+	};
+	
+	markDownProto.attributeChangedCallback = function(attr, oldVal, newVal) {
+		var self = this;
+		if (attr === 'css') {
+			this.setcss(newVal);
+		}
+		console.log(self);
+		if (attr === 'src') {
+			$.ajax(newVal).done(function (data) {
+				self.setmarkdown(marked(data));
+			});
+		}
+	};
+
+	markDownProto.setcss = function (val) {
+		var self = this;
+		var url = 'bower_components/github-markdown-css/github-markdown.css';
+		if (typeof val !== 'undefined' && val !== '') {
+			url = val;
+		}
+		//loads the css as <style>
+		$.ajax(url).done(function (data) {
+			self.css.textContent = data;
+		});
 	};
 
 	// Sets new value to "markdown" attribute
 	markDownProto.setmarkdown = function(val) {
 		this.markdown = val;
 
-		// Sets "markdown" value into <strong>
+		// Sets "markdown" value into div
 		this.div.innerHTML = this.markdown;
+
+		//flag markdown loaded
+		this.div.classList.add('loaded');
 	};
 
 	// Registers <hello-world> in the main document
