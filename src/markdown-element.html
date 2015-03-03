@@ -75,8 +75,8 @@
 		if (attr === 'css') {
 			this.setcss(newVal);
 		}
-		console.log(self);
 		if (attr === 'src') {
+			this.div.classList.toggle('loaded');
 			$.ajax(newVal).done(function (data) {
 				self.setmarkdown(marked(data));
 			});
@@ -103,7 +103,7 @@
 		this.div.innerHTML = this.markdown;
 
 		//flag markdown loaded
-		this.div.classList.add('loaded');
+		this.div.classList.toggle('loaded');
 	};
 
 	// Registers <hello-world> in the main document
