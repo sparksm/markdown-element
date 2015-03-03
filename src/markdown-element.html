@@ -1,9 +1,9 @@
+<!--
 <link rel="import" href="../../../elements/lib/lib-jquery/lib-jquery.html" />
 <script src="../../marked/marked.min.js"></script>
-<!--
+-->
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 <script src="../bower_components/marked/marked.min.js"></script>
--->
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 
 <template>
@@ -70,8 +70,11 @@
 			this.setmarkdown(markdown);
 		}
 
+	};
+	
+	markDownProto.attachedCallback = function () {
+		var self = this;
 		this.setcss();
-
 	};
 	
 	markDownProto.attributeChangedCallback = function(attr, oldVal, newVal) {
