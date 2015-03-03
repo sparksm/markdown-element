@@ -2,6 +2,10 @@
 
 > markdown element web component
 
+```javascript
+$('.comment-block').confab({ allowDelete: true })
+```
+
 ## Demo
 
 [Check it live!](http://sparksm.github.io/markdown-element)

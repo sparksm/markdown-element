@@ -1,12 +1,10 @@
 <link rel="import" href="../../../elements/lib/lib-jquery/lib-jquery.html" />
 <script src="../../marked/marked.min.js"></script>
-
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 <!--
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 <script src="../bower_components/marked/marked.min.js"></script>
 -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 
 <template>
 	<style>
@@ -22,7 +20,8 @@
 			opacity: 1;
 		}
 	</style>
-	<style id="external-css"></style>
+	<style id="markdown-css"></style>
+	<style id="highlight-css"></style>
 	<div class="markdown-body"></div>
 </template>
 
@@ -57,7 +56,8 @@
 
 		// Caches <strong> DOM query
 		this.div = shadowRoot.querySelector('.markdown-body');
-		this.css = shadowRoot.querySelector('#external-css');
+		this.css = shadowRoot.querySelector('#markdown-css');
+		this.hlcss = shadowRoot.querySelector('#highlight-css');
 
 		// Checks if the "markdown" attribute has been overwritten
 		if (this.hasAttribute('src') && this.getAttribute('src') !== '') {
@@ -71,6 +71,7 @@
 		}
 
 		this.setcss();
+
 	};
 	
 	markDownProto.attributeChangedCallback = function(attr, oldVal, newVal) {
@@ -96,6 +97,9 @@
 		$.ajax(url).done(function (data) {
 			self.css.textContent = data;
 		});
+		$.ajax('//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css').done(function (data) {
+			self.hlcss.textContent = data;
+		});
 	};
 
 	// Sets new value to "markdown" attribute
@@ -107,7 +111,10 @@
 
 		//flag markdown loaded
 		this.div.classList.toggle('loaded');
-		hljs.initHighlightingOnLoad();
+
+		$(this.div.querySelector('code')).each(function (i, block) {
+			hljs.highlightBlock(block);
+		});
 	};
 
 	// Registers <hello-world> in the main document
