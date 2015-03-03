@@ -1,6 +1,6 @@
 {
   "name": "markdown-element",
-  "version": "0.0.0",
+  "version": "0.2.1",
   "description": "markdown element web component",
   "license": "MIT",
   "main": "src/markdown-element.html",
